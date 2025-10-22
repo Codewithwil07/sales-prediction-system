@@ -19,9 +19,9 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'username',
-        'email',
         'password',
-        'role'
+        'role',
+        'reset_pin'
     ];
 
     /**
@@ -35,7 +35,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Get the attributes that should be cast
      *
      * @return array<string, string>
      */
