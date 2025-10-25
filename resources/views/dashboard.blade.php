@@ -4,14 +4,6 @@
         Dashboard
     </x-slot>
 
-    <div class="mb-4 -mt-2 flex justify-end">
-        <a href="{{ route('test.notification') }}"
-            class="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg text-xs font-semibold hover:bg-yellow-200 border border-yellow-200">
-            <i data-lucide="bell" class="w-4 h-4"></i>
-            Tes Notifikasi
-        </a>
-    </div>
-
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">

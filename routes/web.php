@@ -14,15 +14,6 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
-Route::get('/test-notifikasi', function () {
-    Notification::make()
-        ->title('Berhasil!')
-        ->body('Jika Anda melihat ini, artinya Filament Notifications sudah berfungsi.')
-        ->success() // Tipe notifikasi (success, warning, danger)
-        ->send(); // Kirim notifikasi
-
-    return redirect()->route('dashboard');
-})->middleware('auth')->name('test.notification');
 
 // Rute aplikasi utama
 Route::middleware('auth')->group(function () {

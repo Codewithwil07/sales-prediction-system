@@ -9,17 +9,22 @@ class Penjualan extends Model
 {
     use HasFactory;
 
-    /**
-     * Tentukan nama tabel secara eksplisit
-     */
     protected $table = 'penjualan';
 
-    /**
-     * Atribut yang boleh diisi
-     */
     protected $fillable = [
         'bulan',
         'tahun',
         'jumlah_terjual',
+    ];
+
+    /**
+     * TAMBAHKAN PROPERTI INI
+     * * Memberitahu Laravel untuk otomatis mengubah
+     * tipe data saat mengambil/menyimpan.
+     */
+    protected $casts = [
+        'bulan' => 'integer',
+        'tahun' => 'integer',
+        'jumlah_terjual' => 'integer',
     ];
 }

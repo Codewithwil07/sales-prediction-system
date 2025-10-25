@@ -3,68 +3,89 @@
         Data Penjualan Historis
     </x-slot>
 
-    <div class="space-y-6">
+    <div
+        x-data="{
+            createModal: {{ $errors->any() && old('form_type') === 'create' ? 'true' : 'false' }},
+            editModal: {{ $errors->any() && old('form_type') === 'edit' ? 'true' : 'false' }},
+            deleteModal: false,
+            editItem: { 
+                id: '{{ old('id') }}', 
+                bulan: '{{ old('bulan') }}', 
+                tahun: '{{ old('tahun') }}', 
+                jumlah_terjual: '{{ old('jumlah_terjual') }}' 
+            },
+            deleteUrl: '',
+            editUrl: '{{ $errors->any() && old('form_type') === 'edit' ? route('penjualan.update', old('id')) : '' }}'
+        }"
+        class="space-y-6">
 
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
 
-            <form class="sm:w-1/3">
+            <form action="{{ route('penjualan.index') }}" method="GET" class="flex items-center gap-2 sm:w-1/3">
                 <label for="search" class="sr-only">Cari</label>
-                <div class="relative">
+                <div class="relative flex-grow">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
                     </div>
                     <input type="text" name="search" id="search"
-                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        placeholder="Cari berdasarkan bulan atau tahun...">
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="Cari bulan atau tahun..." value="{{ request('search') }}">
                 </div>
+                <button type="submit"
+                    class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cari
+                </button>
             </form>
 
-            <a href="{{ route('penjualan.create') }}"
+            <button
+                @click="createModal = true"
                 class="inline-flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                 <i data-lucide="plus" class="w-4 h-4"></i>
                 <span>Tambah Data Penjualan</span>
-            </a>
+            </button>
         </div>
+
         <div class="w-full overflow-x-auto border border-gray-200 rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            No
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Bulan
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tahun
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Jumlah Terjual (Pcs)
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Aksi
-                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bulan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tahun</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah (Pcs)</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-
                     @forelse ($dataPenjualan as $item)
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $loop->iteration + $dataPenjualan->firstItem() - 1 }}
+                        <td class="px-6 py-4 text-sm text-gray-500">{{ $loop->iteration + $dataPenjualan->firstItem() - 1 }}</td>
+
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                            {{ $item->bulan }} ({{ \Carbon\Carbon::create()->month($item->bulan)->isoFormat('MMMM') }})
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ $item->bulan }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $item->tahun }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $item->jumlah_terjual }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                            <a href="#" class="text-red-600 hover:text-red-900">Hapus</a>
+
+                        <td class="px-6 py-4 text-sm text-gray-500">{{ $item->tahun }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">{{ $item->jumlah_terjual }}</td>
+                        <td class="px-6 py-4 text-right text-sm font-medium space-x-3">
+                            <button
+                                @click="
+                                        editModal = true;
+                                        editUrl = '{{ route('penjualan.update', $item->id) }}';
+                                        editItem = { 
+                                            id: '{{ $item->id }}', 
+                                            bulan: '{{ $item->bulan }}', 
+                                            tahun: '{{ $item->tahun }}', 
+                                            jumlah_terjual: '{{ $item->jumlah_terjual }}' 
+                                        };
+                                    "
+                                class="text-indigo-600 hover:text-indigo-900 font-medium">Edit</button>
+                            <button
+                                @click="
+                                        deleteModal = true;
+                                        deleteUrl = '{{ route('penjualan.destroy', $item->id) }}';
+                                    "
+                                class="text-red-600 hover:text-red-900 font-medium">Hapus</button>
                         </td>
                     </tr>
                     @empty
@@ -78,13 +99,124 @@
                         </td>
                     </tr>
                     @endforelse
-
                 </tbody>
             </table>
         </div>
+
         <div>
             {{ $dataPenjualan->links() }}
         </div>
+
+        <x-modal name="createModal" title="Tambah Data Penjualan Baru">
+            <form action="{{ route('penjualan.store') }}" method="POST" class="space-y-4">
+                @csrf
+                <input type="hidden" name="form_type" value="create">
+
+                <div>
+                    <x-input-label for="create_bulan" :value="__('Bulan (Angka 1-12)')" />
+                    <x-text-input
+                        id="create_bulan"
+                        class="block mt-1 w-full"
+                        type="number"
+                        name="bulan"
+                        :value="old('bulan')"
+                        required
+                        autofocus
+                        min="1"
+                        max="12"
+                        placeholder="Contoh: 1 (untuk Januari)" />
+                    <x-input-error :messages="$errors->get('bulan')" class="mt-2" />
+                </div>
+
+                <div>
+                    <x-input-label for="create_tahun" :value="__('Tahun')" />
+                    <x-text-input id="create_tahun" class="block mt-1 w-full" type="number" name="tahun" :value="old('tahun')" required placeholder="Contoh: 2024" />
+                    <x-input-error :messages="$errors->get('tahun')" class="mt-2" />
+                </div>
+
+                <div>
+                    <x-input-label for="create_jumlah" :value="__('Jumlah Terjual (Pcs)')" />
+                    <x-text-input id="create_jumlah" class="block mt-1 w-full" type="number" name="jumlah_terjual" :value="old('jumlah_terjual')" required />
+                    <x-input-error :messages="$errors->get('jumlah_terjual')" class="mt-2" />
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4">
+                    <button @click="createModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Batal
+                    </button>
+                    <x-primary-button>
+                        Simpan Data
+                    </x-primary-button>
+                </div>
+            </form>
+        </x-modal>
+
+        <x-modal name="editModal" title="Edit Data Penjualan">
+            <form x-bind:action="editUrl" method="POST" class="space-y-4">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="form_type" value="edit">
+                <input type="hidden" name="id" x-bind:value="editItem.id">
+
+                <div>
+                    <x-input-label for="edit_bulan" :value="__('Bulan (Angka 1-12)')" />
+                    <x-text-input
+                        id="edit_bulan"
+                        class="block mt-1 w-full"
+                        type="number"
+                        name="bulan"
+                        x-bind:value="editItem.bulan"
+                        required
+                        autofocus
+                        min="1"
+                        max="12"
+                        placeholder="Contoh: 1 (untuk Januari)" />
+                    <x-input-error :messages="$errors->get('bulan')" class="mt-2" />
+                </div>
+
+                <div>
+                    <x-input-label for="edit_tahun" :value="__('Tahun')" />
+                    <x-text-input id="edit_tahun" class="block mt-1 w-full" type="number" name="tahun" x-bind:value="editItem.tahun" required placeholder="Contoh: 2024" />
+                    <x-input-error :messages="$errors->get('tahun')" class="mt-2" />
+                </div>
+
+                <div>
+                    <x-input-label for="edit_jumlah" :value="__('Jumlah Terjual (Pcs)')" />
+                    <x-text-input id="edit_jumlah" class="block mt-1 w-full" type="number" name="jumlah_terjual" x-bind:value="editItem.jumlah_terjual" required />
+                    <x-input-error :messages="$errors->get('jumlah_terjual')" class="mt-2" />
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4">
+                    <button @click="editModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Batal
+                    </button>
+                    <x-primary-button>
+                        Update Data
+                    </x-primary-button>
+                </div>
+            </form>
+        </x-modal>
+
+        <x-modal name="deleteModal" title="Hapus Data Penjualan">
+            <form x-bind:action="deleteUrl" method="POST">
+                @csrf
+                @method('DELETE')
+
+                <p class="text-gray-600">
+                    Apakah Anda yakin ingin menghapus data ini?
+                    Tindakan ini tidak dapat dibatalkan.
+                </p>
+
+                <div class="flex justify-end gap-3 pt-6">
+                    <button @click="deleteModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700">
+                        Ya, Hapus
+                    </button>
+                </div>
+            </form>
+        </x-modal>
 
     </div>
 </x-admin-layout>
