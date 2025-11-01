@@ -1,5 +1,6 @@
+@import "toastify-js/src/toastify.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 /* TAMBAHKAN INI */
-@import "toastify-js/src/toastify.css";

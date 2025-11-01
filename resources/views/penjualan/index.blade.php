@@ -21,20 +21,34 @@
 
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
 
-            <form action="{{ route('penjualan.index') }}" method="GET" class="flex items-center gap-2 sm:w-1/3">
-                <label for="search" class="sr-only">Cari</label>
-                <div class="relative flex-grow">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+            <form action="{{ route('penjualan.index') }}" method="GET" class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+
+                <div class="flex items-center gap-2">
+                    <div class="relative flex-grow" style="min-width: 250px;">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        <input type="text" name="search" id="search"
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            placeholder="Cari bulan atau tahun..." value="{{ request('search') }}">
                     </div>
-                    <input type="text" name="search" id="search"
-                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        placeholder="Cari bulan atau tahun..." value="{{ request('search') }}">
+
+                    <button type="submit"
+                        class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cari
+                    </button>
+
+                    <div class="flex-shrink-0">
+                        <label for="sort" class="sr-only">Urutkan</label>
+                        <select name="sort" id="sort"
+                            onchange="this.form.submit()" class="block w-full py-2 pl-3 pr-8 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+
+                            <option value="terbaru" @selected($sort==='terbaru' )>Urutan Terbaru</option>
+                            <option value="terlama" @selected($sort==='terlama' )>Urutan Terlama</option>
+                        </select>
+                    </div>
+
                 </div>
-                <button type="submit"
-                    class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Cari
-                </button>
             </form>
 
             <button

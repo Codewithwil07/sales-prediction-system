@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\PeramalanController;
 use App\Http\Controllers\ProfileController;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Route;
@@ -9,26 +12,18 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 
 
 // Rute aplikasi utama
 Route::middleware('auth')->group(function () {
-    
-    // 2. TAMBAHKAN ROUTE RESOURCE INI
-    // Ini akan otomatis membuat route untuk:
-    // - GET /penjualan (index)
-    // - GET /penjualan/create (create)
-    // - POST /penjualan (store)
-    // - GET /penjualan/{id} (show)
-    // - GET /penjualan/{id}/edit (edit)
-    // - PUT/PATCH /penjualan/{id} (update)
-    // - DELETE /penjualan/{id} (destroy)
     Route::resource('penjualan', PenjualanController::class);
 
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('peramalan', [PeramalanController::class, 'index'])->name('peramalan.index');
+    Route::post('peramalan/hitung', [PeramalanController::class, 'hitung'])->name('peramalan.hitung');
+
+    Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
 });
 
 

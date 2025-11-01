@@ -32,7 +32,7 @@
             <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-end px-6">
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open" class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
-                        <span >{{ Auth::user()->username }}</span>
+                        <span>{{ Auth::user()->username }}</span>
                         <i data-lucide="chevron-down" class="w-4 h-4"></i>
                     </button>
                     <div x-show="open" @click.away="open = false" x-transition
@@ -57,7 +57,6 @@
                     {{ $header }}
                 </h1>
                 @endisset
-
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                     {{ $slot }}
                 </div>
@@ -74,32 +73,30 @@
     $title = addslashes($notification['title'] ?? 'Berhasil!');
     $body = addslashes($notification['body'] ?? '');
 
-    // Tentukan warna
     $bgColor = '#4f46e5'; // default indigo (info)
     if ($type === 'success') $bgColor = '#10b981'; // green-500
     if ($type === 'danger') $bgColor = '#ef4444'; // red-500
     @endphp
 
     <script>
+        // Bungkus di DOMContentLoaded biar aman
         document.addEventListener('DOMContentLoaded', function() {
             Toastify({
                 text: "<strong class='font-semibold text-base'>{{ $title }}</strong><br><span class='text-sm'>{{ $body }}</span>",
-                duration: 1500, // 4 detik
-                close: false, // Menampilkan tombol close 'x'
+                duration: 4000,
+                close: true,
                 gravity: "top",
                 position: "right",
                 stopOnFocus: true,
-                escapeMarkup: false, // Izinkan HTML (untuk <strong>)
+                escapeMarkup: false,
                 style: {
                     background: "{{ $bgColor }}",
-                    color: "white", // Pastikan teksnya putih
-                    borderRadius: "0.5rem", // rounded-lg
-                    boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)", // shadow-lg
-                    padding: "1rem", // p-4 (sedikit lebih kecil dari sebelumnya)
-                    minWidth: "340px", // Beri lebar minimal agar tidak aneh
-                    position: 'absolute',
-                    right: '100px',
-                    // HAPUS 'width: 5rem' YANG BIKIN RUSAK
+                    color: "white",
+                    borderRadius: "0.5rem",
+                    boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+                    padding: "1rem",
+                    minWidth: "340px",
+                    // Hapus style 'position' & 'right' aneh dari kode lo
                 }
             }).showToast();
         });
