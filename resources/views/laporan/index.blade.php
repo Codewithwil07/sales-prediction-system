@@ -131,13 +131,13 @@
     </div>
 </x-admin-layout>
 
-
+@if($chartData)
 <script>
     // Kita bungkus DOMContentLoaded di sini biar aman
     document.addEventListener('DOMContentLoaded', function() {
 
         // Ambil elemen canvas
-        const chartCanvas = document.querySelector("#dashboard-chart");
+        const chartCanvas = document.querySelector("#laporan-chart");
 
         // Cek jika elemen ada
         if (chartCanvas) {
@@ -205,3 +205,4 @@
         }
     });
 </script>
+@endif
