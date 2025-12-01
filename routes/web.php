@@ -6,6 +6,7 @@ use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\PeramalanController;
 use App\Http\Controllers\ProfileController;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,6 +14,14 @@ Route::get('/', function () {
 });
 
 
+
+Route::get('/mailtest', function () {
+    Mail::raw("Test Mailtrap dari route", function ($m) {
+        $m->to('test@example.com')->subject("Mailtrap Test");
+    });
+
+    return "Email dikirim, cek Mailtrap bro!";
+});
 
 
 // Rute aplikasi utama

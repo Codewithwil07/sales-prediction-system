@@ -6,47 +6,56 @@ use App\Models\Penjualan;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Redirect;
+// Kita nggak pakai Filament lagi, jadi hapus import-nya
+// use Filament\Notifications\Notification; 
 
 class PenjualanController extends Controller
 {
+    /**
+     * Tampilkan halaman utama (daftar data penjualan).
+     */
     public function index(Request $request)
-    {
-        $query = Penjualan::query();
+{
+    $query = Penjualan::query();
 
-        // Ambil value 'sort' dari URL, default-nya 'terbaru'
-        $sort = $request->input('sort', 'terbaru');
+    $sort = $request->input('sort'); // null = default
+    $filterTahun = $request->input('filter_tahun');
+    $search = $request->input('search');
 
-        // Logic Search (tetap sama)
-        if ($request->has('search') && $request->search != '') {
-            $query->where('bulan', 'like', '%' . $request->search . '%')
-                ->orWhere('tahun', 'like', '%' . $request->search . '%');
-        }
-
-        // --- INI BAGIAN BARUNYA ---
-        // Logic Filter/Sort
-        if ($sort === 'terlama') {
-            // Urutkan dari tahun terlama, lalu bulan terlama
-            $query->orderBy('tahun', 'asc')->orderBy('bulan', 'asc');
-        } else {
-            // Default: 'terbaru'
-            // Urutkan dari tahun terbaru, lalu bulan terbaru
-            $query->orderBy('tahun', 'desc')->orderBy('bulan', 'desc');
-        }
-        // --- SELESAI BAGIAN BARU ---
-
-        // Paginasi (tambahkan withQueryString agar filter tetap nempel)
-        $dataPenjualan = $query->paginate(10)->withQueryString();
-
-        return view('penjualan.index', [
-            'dataPenjualan' => $dataPenjualan,
-            'sort' => $sort // Kirim balik nilai 'sort' ke view (penting untuk dropdown)
-        ]);
-    }
-    public function create()
-    {
-        return abort(404);
+    if ($request->filled('filter_tahun')) {
+        $query->where('tahun', $filterTahun);
     }
 
+    if ($request->filled('search')) {
+        $query->where(function ($q) use ($search) {
+            $q->where('bulan', 'like', '%' . $search . '%')
+              ->orWhere('tahun', 'like', '%' . $search . '%');
+        });
+    }
+
+    // Sorting: default = tahun ASC (terlama), bulan ASC (Januari = 1 di atas)
+    if ($sort === 'terbaru') {
+        $query->orderBy('tahun', 'desc')
+              ->orderByRaw('CAST(bulan AS UNSIGNED) desc');
+    } elseif ($sort === 'terlama') {
+        $query->orderBy('tahun', 'asc')
+              ->orderByRaw('CAST(bulan AS UNSIGNED) asc');
+    } else {
+        $query->orderBy('tahun', 'asc')
+              ->orderByRaw('CAST(bulan AS UNSIGNED) asc');
+    }
+
+    $daftarTahun = Penjualan::select('tahun')->distinct()->orderBy('tahun', 'desc')->pluck('tahun');
+    $dataPenjualan = $query->paginate(10)->withQueryString();
+
+    return view('penjualan.index', compact('dataPenjualan', 'daftarTahun'))
+           ->with(['filters' => $request->only(['filter_tahun','search','sort']), 'sort' => $sort]);
+}
+
+
+    /**
+     * Simpan data baru ke database.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -60,24 +69,16 @@ class PenjualanController extends Controller
 
         Penjualan::create($validated);
 
-        // KIRIM NOTIFIKASI BARU (format 'notification' standar)
         return Redirect::route('penjualan.index')->with('notification', [
-            'type' => 'success', // 'success' atau 'danger'
+            'type' => 'success',
             'title' => 'Data Berhasil Disimpan',
             'body' => 'Data penjualan baru telah ditambahkan.'
         ]);
     }
 
-    public function show(Penjualan $penjualan)
-    {
-        return abort(404);
-    }
-
-    public function edit(Penjualan $penjualan)
-    {
-        return abort(404);
-    }
-
+    /**
+     * Update data di database.
+     */
     public function update(Request $request, Penjualan $penjualan)
     {
         $validated = $request->validate([
@@ -91,7 +92,6 @@ class PenjualanController extends Controller
 
         $penjualan->update($validated);
 
-        // KIRIM NOTIFIKASI BARU
         return Redirect::route('penjualan.index')->with('notification', [
             'type' => 'success',
             'title' => 'Data Berhasil Diperbarui',
@@ -99,15 +99,31 @@ class PenjualanController extends Controller
         ]);
     }
 
+    /**
+     * Hapus data dari database.
+     */
     public function destroy(Penjualan $penjualan)
     {
         $penjualan->delete();
 
-        // KIRIM NOTIFIKASI BARU
         return Redirect::route('penjualan.index')->with('notification', [
-            'type' => 'danger', // Ini akan jadi merah
+            'type' => 'danger',
             'title' => 'Data Berhasil Dihapus',
             'body' => 'Data penjualan telah dihapus dari sistem.'
         ]);
+    }
+
+    // --- Method tidak terpakai (karena pakai modal) ---
+    public function create()
+    {
+        return abort(404);
+    }
+    public function show(Penjualan $penjualan)
+    {
+        return abort(404);
+    }
+    public function edit(Penjualan $penjualan)
+    {
+        return abort(404);
     }
 }
